@@ -934,7 +934,7 @@ class Translator {
 			],
 			lastTime: 0,
 			lastRatelimit: 0,
-			ratelimit: 5000,
+			ratelimit: 2000,
 		},
 	};
 
