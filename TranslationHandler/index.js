@@ -966,7 +966,6 @@ class Translator {
 					nodeIntegrationInWorker: true,
 				},
 			});
-			window.webContents.openDevTools();
 			return window;
 		};
 
