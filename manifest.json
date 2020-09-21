@@ -1,7 +1,7 @@
 {
-    "name": "Message Translate",
-    "description": "Translates messages to and from languages semi-automagically.",
-    "author": "Куzа#1794",
-    "version": "0.0.3",
-    "license": "MIT"
+	"name": "Message Translate",
+	"description": "Translates messages to and from languages semi-automagically.",
+	"author": "Куzа#1794",
+	"version": "0.2.0",
+	"license": "MIT"
 }

@@ -1,0 +1,10 @@
+{
+	"name": "message-translate",
+	"version": "1.0.0",
+	"main": "index.js",
+	"license": "MIT",
+	"dependencies": {
+		"random-useragent": "^0.5.0",
+		"translatte": "^2.5.8"
+	}
+}
