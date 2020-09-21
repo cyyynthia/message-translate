@@ -1,21 +1,26 @@
 const {
-	React,
-	getModuleByDisplayName,
-	getModule,
-} = require("powercord/webpack");
+	Webpack: {
+		FindModule,
+		CommonModules: { React },
+	},
+	Tools: {
+		ReactTools: { WrapBoundary },
+	},
+} = KLibrary;
+const Settings = new KLibrary.Settings("message-translate");
+
 const { open: openModal } = require("powercord/modal");
 const SettingsModal = require("./SettingsModal");
-const SettingsHandler = new (require("../SettingsHandler"))();
-const Tooltip = getModuleByDisplayName("Tooltip", false);
+const Tooltip = FindModule.byDisplayName("Tooltip", false);
 const Button = require("powercord/components").Button;
 
-const buttonClasses = getModule(["button"], false);
-const buttonWrapperClasses = getModule(["buttonWrapper", "pulseButton"], false);
-const buttonTextAreaClasses = getModule(["button", "textArea"], false);
+const buttonClasses = FindModule.byProps("button");
+const buttonWrapperClasses = FindModule.byProps("buttonWrapper", "pulseButton");
+const buttonTextAreaClasses = FindModule.byProps("button", "textArea");
 
 class SettingsButton extends React.Component {
 	render() {
-		const settings = SettingsHandler.getSettings();
+		const settings = Settings.getSettings();
 		return (
 			<Tooltip
 				color="black"
@@ -24,7 +29,9 @@ class SettingsButton extends React.Component {
 			>
 				{({ onMouseLeave, onMouseEnter }) => (
 					<Button
-						className={`message-translate-settings-button${settings.translate_sent_messages ? " active" : ""}`}
+						className={`message-translate-settings-button${
+							settings.translate_sent_messages ? " active" : ""
+						}`}
 						look={Button.Looks.BLANK}
 						size={Button.Sizes.ICON}
 						onClick={() => {
@@ -54,4 +61,4 @@ class SettingsButton extends React.Component {
 	}
 }
 
-module.exports = SettingsButton;
+module.exports = WrapBoundary(SettingsButton);

@@ -5,6 +5,12 @@ const { FormTitle } = require("powercord/components");
 const { close: closeModal } = require("powercord/modal");
 const Settings = require("./Settings");
 
+const {
+	Tools: {
+		ReactTools: { WrapBoundary },
+	},
+} = KLibrary;
+
 class SettingsModal extends React.Component {
 	render() {
 		return (
@@ -30,4 +36,4 @@ class SettingsModal extends React.Component {
 	}
 }
 
-module.exports = SettingsModal;
+module.exports = WrapBoundary(SettingsModal);

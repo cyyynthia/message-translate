@@ -1,32 +1,37 @@
 const {
-	React,
-} = require("powercord/webpack");
+	Webpack: {
+		CommonModules: { React },
+	},
+	Tools: {
+		ReactTools: { WrapBoundary },
+	},
+} = KLibrary;
+const KSettings = new KLibrary.Settings("message-translate");
+
 const {
 	settings: { SelectInput, SwitchItem },
 } = require("powercord/components");
-const SettingsHandler = new (require("../SettingsHandler"))();
 
 class Settings extends React.Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			settings: SettingsHandler.getSettings(),
+			settings: KSettings.getSettings(),
 		};
 	}
 
 	setSetting = (setting, value) => {
 		let settings = Object.assign({}, this.state.settings);
 		settings[setting] = value;
-		console.log(settings);
-		SettingsHandler.setSettings(settings);
+		KSettings.setSettings(settings);
 		this.setState({
 			settings,
 		});
 	};
 
 	getSetting = (setting, defaultValue = "") => {
-		const settings = SettingsHandler.getSettings();
+		const settings = KSettings.getSettings();
 		return settings[setting] ? settings[setting] : defaultValue;
 	};
 
@@ -80,6 +85,17 @@ class Settings extends React.Component {
 						);
 					}}
 				/>
+				<SwitchItem
+					children={["Translate Received Messages"]}
+					note="Whether or not to translate messages you receive automagically. This only works in the current channel."
+					value={this.state.settings.translate_received_messages}
+					onChange={(event) => {
+						this.setSetting(
+							"translate_received_messages",
+							event.target.checked
+						);
+					}}
+				/>
 				<SelectInput
 					children={["Translation Engine"]}
 					note="The translation engine you want to use."
@@ -115,4 +131,4 @@ class Settings extends React.Component {
 	}
 }
 
-module.exports = Settings;
+module.exports = WrapBoundary(Settings);

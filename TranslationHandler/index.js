@@ -1,17 +1,14 @@
 const {
-	remote: { BrowserWindow },
-} = require("electron");
-const { getModule } = require("powercord/webpack");
-const { remote } = require("electron");
-const ipc = require("electron").ipcRenderer;
-const fs = require("fs");
-const path = require("path");
-const messageClasses = getModule(["markup"], false);
-const { forceUpdateElement } = require("powercord/util");
-const { resolve } = require("path");
-const SettingsHandler = new (require("../SettingsHandler"))();
-const dispatcher = getModule(['dirtyDispatch'], false);
-const { getMessage } = getModule(['getMessages'], false);
+	Webpack: {
+		FindModule,
+		CommonModules: { FluxDispatcher },
+	},
+} = KLibrary;
+const Settings = new KLibrary.Settings("message-translate");
+
+const { getMessage } = FindModule.byProps("getMessages");
+const translatte = require("../node_modules/translatte");
+const randomUseragent = require("../node_modules/random-useragent");
 
 class Translator {
 	constructor() {
@@ -934,12 +931,12 @@ class Translator {
 			],
 			lastTime: 0,
 			lastRatelimit: 0,
-			ratelimit: 2000,
+			ratelimit: 1000,
 		},
 	};
 
 	translate = async (text, language, engine, async = true) => {
-		if (!this.engines[engine]) return reject();
+		if (!this.engines[engine]) return;
 
 		const started = Date.now();
 
@@ -950,11 +947,11 @@ class Translator {
 			lastTime +
 				this.engines[engine].ratelimit +
 				this.engines[engine].lastRatelimit <
-				started
+			started
 				? 0
 				: this.engines[engine].ratelimit +
-				this.engines[engine].lastRatelimit -
-				(started - lastTime);
+				  this.engines[engine].lastRatelimit -
+				  (started - lastTime);
 
 		this.engines[engine].lastRatelimit = timeout;
 
@@ -966,35 +963,49 @@ class Translator {
 					nodeIntegrationInWorker: true,
 				},
 			});
+			window.webContents.openDevTools();
 			return window;
 		};
 
 		const translateFunctions = {
 			google: (text, language) => {
 				return new Promise((resolve, reject) => {
-					const window = createWindow();
-					window.webContents.on("did-finish-load", () => {
-						ipc.on(
-							"message-translate-translation",
-							(event, message) => {
-								try {
-									window.close();
-								} catch { }
-								if (message) resolve(message);
-								reject();
-							}
-						);
-						window.webContents.executeJavaScript(`
-							require("electron").ipcRenderer.sendTo(${
-							remote.getCurrentWindow().webContents.id
-							}, "message-translate-translation", (document.querySelector(".translation") || {}).innerText);
-						`);
-					});
-					window.loadURL(
-						`https://translate.google.com/#auto/${language}/${encodeURIComponent(
-							text
-						)}`
-					);
+					translatte(text, {
+						to: language,
+						agents: randomUseragent.getAll(),
+					})
+						.then((res) => {
+							resolve({
+								text: res.text,
+								originalLanguage: res.from.language.iso,
+							});
+						})
+						.catch((err) => {
+							reject(err);
+						});
+					// const window = createWindow();
+					// window.webContents.on("did-finish-load", () => {
+					// 	ipc.on(
+					// 		"message-translate-translation",
+					// 		(event, message) => {
+					// 			try {
+					// 				window.close();
+					// 			} catch {}
+					// 			if (message) resolve(message);
+					// 			reject();
+					// 		}
+					// 	);
+					// 	window.webContents.executeJavaScript(`
+					// 		require("electron").ipcRenderer.sendTo(${
+					// 			remote.getCurrentWindow().webContents.id
+					// 		}, "message-translate-translation", (document.querySelector(".translation") || {}).innerText);
+					// 	`);
+					// });
+					// window.loadURL(
+					// 	`https://translate.google.com/#auto/${language}/${encodeURIComponent(
+					// 		text
+					// 	)}`
+					// );
 				});
 			},
 		};
@@ -1004,27 +1015,27 @@ class Translator {
 				const finished = Date.now();
 
 				const excepted = this.removeExceptions(text);
-				let translatedText;
+				let translationResults;
 				let tries = 0;
 
-				while (!translatedText && tries < 3) {
+				while (!translationResults && tries < 3) {
 					tries++;
 					try {
-						translatedText = await translateFunctions[engine](
+						translationResults = await translateFunctions[engine](
 							excepted.text,
 							language
 						);
-					} catch (e) { }
+					} catch (e) {}
 				}
 
-				if (!translatedText) reject();
+				if (!translationResults) reject();
 
-				const results = this.addExceptions(
-					translatedText,
+				translationResults.text = this.addExceptions(
+					translationResults.text,
 					excepted.exceptions
 				);
 
-				resolve(results);
+				resolve(translationResults);
 			}, timeout);
 		};
 
@@ -1035,43 +1046,78 @@ class Translator {
 	};
 
 	translateMessage = async (message, language, engine, async = true) => {
+		if (!message.content || message.content.length === 0) {
+			return "";
+		}
 		// If any of the properties don't exist, make them.
 		if (!this.cache[message.channel_id]) {
 			this.cache[message.channel_id] = {};
 		}
+		let alreadyTranslated = true;
 		if (!this.cache[message.channel_id][message.id]) {
+			alreadyTranslated = false;
 			this.cache[message.channel_id][message.id] = {
 				channelID: message.channel_id,
 				currentLanguage: "original",
+				originalLanguage: null,
 				engines: {},
-				originalContent: message.content
-			}
+				originalContent: message.content,
+			};
 		}
 		if (!this.cache[message.channel_id][message.id].engines[engine]) {
 			this.cache[message.channel_id][message.id].engines[engine] = {};
 		}
-		if (!this.cache[message.channel_id][message.id].engines[engine][language]) {
-			this.cache[message.channel_id][message.id].engines[engine][language] = {};
+		if (
+			!this.cache[message.channel_id][message.id].engines[engine][
+				language
+			]
+		) {
+			this.cache[message.channel_id][message.id].engines[engine][
+				language
+			] = {};
 		}
 
 		// If the target language is the original language, set it back.
-		const settings = SettingsHandler.getSettings();
+		const settings = Settings.getSettings();
 		// If the target language is cached, use it.
 		if (language == "original") {
-			this.cache[message.channel_id][message.id].currentLanguage = "original";
-			message.content =
-				this.cache[message.channel_id][message.id].originalContent;
-		} else if (this.cache[message.channel_id][message.id].engines[engine][language].content) {
-			this.cache[message.channel_id][message.id].currentLanguage = language;
-			message.content =
-				this.cache[message.channel_id][message.id].engines[engine][language].content;
-		} else {
+			this.cache[message.channel_id][message.id].currentLanguage =
+				"original";
+			message.content = this.cache[message.channel_id][
+				message.id
+			].originalContent;
+		} else if (
+			this.cache[message.channel_id][message.id].engines[engine][language]
+				.content
+		) {
+			this.cache[message.channel_id][
+				message.id
+			].currentLanguage = language;
+			message.content = this.cache[message.channel_id][
+				message.id
+			].engines[engine][language].content;
+		} else if (!alreadyTranslated) {
 			const translatePromise = (resolve, reject) => {
 				this.translate(message.content, language, engine, async)
 					.then((results) => {
-						message.content = results;
-						this.cache[message.channel_id][message.id].currentLanguage = language;
-						this.cache[message.channel_id][message.id].engines[engine][language].content = results;
+						message.content = results.text;
+						if (
+							this.cache[message.channel_id][message.id]
+								.originalLanguage === null
+						)
+							this.cache[message.channel_id][
+								message.id
+							].originalLanguage = results.originalLanguage;
+
+						this.cache[message.channel_id][
+							message.id
+						].currentLanguage = language;
+						this.cache[message.channel_id][message.id].engines[
+							engine
+						][language].content = results.text;
+
+						this.updateMessage(message);
+
 						resolve(message);
 					})
 					.catch((e) => {
@@ -1087,22 +1133,23 @@ class Translator {
 
 		if (async) {
 			return await new Promise((resolve) => {
+				this.updateMessage(message);
 				resolve(message);
 			});
 		}
 		return new Promise((resolve) => {
+			this.updateMessage(message);
 			resolve(message);
 		});
 	};
 
-
 	updateMessage(message) {
-		dispatcher.dispatch({
+		FluxDispatcher.dirtyDispatch({
 			translation: true,
 			type: "MESSAGE_UPDATE",
-			message
+			message,
 		});
-	};
+	}
 
 	clearCache = () => {
 		for (let channelID in this.cache) {
