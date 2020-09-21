@@ -7,8 +7,8 @@ const {
 const Settings = new KLibrary.Settings("message-translate");
 
 const { getMessage } = FindModule.byProps("getMessages");
-const translatte = require("../node_modules/translatte");
-const randomUseragent = require("../node_modules/random-useragent");
+const translatte = require("../fake_node_modules/translatte");
+const randomUseragent = require("../fake_node_modules/random-useragent");
 
 class Translator {
 	constructor() {
