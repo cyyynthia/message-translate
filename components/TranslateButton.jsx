@@ -1,20 +1,15 @@
-const {
-	Webpack: {
-		FindModule,
-		CommonModules: { React },
-	},
-	Tools: {
-		ReactTools: { WrapBoundary },
-	},
-} = KLibrary;
-const Settings = new KLibrary.Settings("message-translate");
+/*
+ * Copyright (c) 2020 Bowser65
+ * Licensed under the Open Software License version 3.0
+ * Original work under MIT; See LICENSE.
+ */
 
-const Tooltip = FindModule.byDisplayName("Tooltip");
-const classes = FindModule.byProps("icon", "isHeader");
-const { open: openModal } = require("powercord/modal");
-const SettingsModal = require("./SettingsModal");
-const { Button } = FindModule.byFilter(
-	(m) => m.default.displayName === "MiniPopover"
+const { React, getModule, getModuleByDisplayName } = require('powercord/webpack')
+
+const Tooltip = getModuleByDisplayName('Tooltip', false)
+const classes = getModule([ "icon", "isHeader" ], false);
+const { Button } = getModule(
+	(m) => m.default && m.default.displayName === "MiniPopover", false
 );
 
 class TranslateButton extends React.Component {
@@ -24,7 +19,7 @@ class TranslateButton extends React.Component {
 
 	generateToastID() {
 		return (
-			"pc-translate-translating-" +
+			"translate-translating-" +
 			Math.random()
 				.toString(36)
 				.replace(/[^a-z]+/g, "")
@@ -39,18 +34,13 @@ class TranslateButton extends React.Component {
 					<Button
 						className={`message-translate-translate-button`}
 						onClick={async () => {
-							const settings = Settings.getSettings();
 							if (
-								!settings.translation_engine ||
-								!settings.user_language
+								!this.props.getSetting('translation_engine') ||
+								!this.props.getSetting('user_language')
 							) {
-								openModal(() => (
-									<SettingsModal
-										Translator={this.props.Translator}
-									/>
-								));
+								this.props.openSettings()
 							} else {
-								let targetLanguage = settings.user_language;
+								let targetLanguage = this.props.getSetting('user_language');
 								if (
 									this.props.Translator.cache[
 										this.props.message.channel_id
@@ -69,7 +59,7 @@ class TranslateButton extends React.Component {
 								this.props.Translator.translateMessage(
 									this.props.message,
 									targetLanguage,
-									settings.translation_engine
+									this.props.getSetting('translation_engine')
 								).catch((e) => {
 									console.error(e);
 									powercord.api.notices.sendToast(
@@ -110,4 +100,4 @@ class TranslateButton extends React.Component {
 	}
 }
 
-module.exports = WrapBoundary(TranslateButton);
+module.exports = TranslateButton;

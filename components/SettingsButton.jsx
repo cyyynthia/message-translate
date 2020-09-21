@@ -1,26 +1,19 @@
-const {
-	Webpack: {
-		FindModule,
-		CommonModules: { React },
-	},
-	Tools: {
-		ReactTools: { WrapBoundary },
-	},
-} = KLibrary;
-const Settings = new KLibrary.Settings("message-translate");
+/*
+ * Copyright (c) 2020 Bowser65
+ * Licensed under the Open Software License version 3.0
+ * Original work under MIT; See LICENSE.
+ */
 
-const { open: openModal } = require("powercord/modal");
-const SettingsModal = require("./SettingsModal");
-const Tooltip = FindModule.byDisplayName("Tooltip", false);
-const Button = require("powercord/components").Button;
+const { React, getModule, getModuleByDisplayName } = require("powercord/webpack")
+const { Button } = require("powercord/components");
+const Tooltip = getModuleByDisplayName('Tooltip', false)
 
-const buttonClasses = FindModule.byProps("button");
-const buttonWrapperClasses = FindModule.byProps("buttonWrapper", "pulseButton");
-const buttonTextAreaClasses = FindModule.byProps("button", "textArea");
+const buttonClasses = getModule([ "button" ], false);
+const buttonWrapperClasses = getModule([ "buttonWrapper", "pulseButton" ], false);
+const buttonTextAreaClasses = getModule([ "button", "textArea" ], false);
 
 class SettingsButton extends React.Component {
 	render() {
-		const settings = Settings.getSettings();
 		return (
 			<Tooltip
 				color="black"
@@ -30,17 +23,11 @@ class SettingsButton extends React.Component {
 				{({ onMouseLeave, onMouseEnter }) => (
 					<Button
 						className={`message-translate-settings-button${
-							settings.translate_sent_messages ? " active" : ""
+							this.props.getSetting('translate_sent_messages') ? " active" : ""
 						}`}
 						look={Button.Looks.BLANK}
 						size={Button.Sizes.ICON}
-						onClick={() => {
-							openModal(() => (
-								<SettingsModal
-									Translator={this.props.Translator}
-								/>
-							));
-						}}
+						onClick={() => this.props.onClick()}
 						onMouseEnter={onMouseEnter}
 						onMouseLeave={onMouseLeave}
 					>
@@ -61,4 +48,4 @@ class SettingsButton extends React.Component {
 	}
 }
 
-module.exports = WrapBoundary(SettingsButton);
+module.exports = SettingsButton;

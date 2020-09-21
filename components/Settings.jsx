@@ -1,40 +1,16 @@
-const {
-	Webpack: {
-		CommonModules: { React },
-	},
-	Tools: {
-		ReactTools: { WrapBoundary },
-	},
-} = KLibrary;
-const KSettings = new KLibrary.Settings("message-translate");
+/*
+ * Copyright (c) 2020 Bowser65
+ * Licensed under the Open Software License version 3.0
+ * Original work under MIT; See LICENSE.
+ */
+
+const { React } = require('powercord/webpack')
 
 const {
 	settings: { SelectInput, SwitchItem },
 } = require("powercord/components");
 
 class Settings extends React.Component {
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			settings: KSettings.getSettings(),
-		};
-	}
-
-	setSetting = (setting, value) => {
-		let settings = Object.assign({}, this.state.settings);
-		settings[setting] = value;
-		KSettings.setSettings(settings);
-		this.setState({
-			settings,
-		});
-	};
-
-	getSetting = (setting, defaultValue = "") => {
-		const settings = KSettings.getSettings();
-		return settings[setting] ? settings[setting] : defaultValue;
-	};
-
 	render() {
 		const engineOptions = Object.keys(this.props.Translator.engines).map(
 			(engine) => {
@@ -48,9 +24,9 @@ class Settings extends React.Component {
 		);
 		let engineLanguages = [];
 
-		if (this.state.settings.translation_engine) {
+		if (this.props.getSetting('translation_engine')) {
 			engineLanguages = this.props.Translator.engines[
-				this.state.settings.translation_engine
+				this.props.getSetting('translation_engine')
 			].languages.map((language) => {
 				if (this.props.Translator.isoLangs[language]) {
 					let label = this.props.Translator.isoLangs[language]
@@ -77,58 +53,42 @@ class Settings extends React.Component {
 				<SwitchItem
 					children={["Translate Sent Messages"]}
 					note="Whether or not to translate messages you send."
-					value={this.state.settings.translate_sent_messages}
-					onChange={(event) => {
-						this.setSetting(
-							"translate_sent_messages",
-							event.target.checked
-						);
-					}}
+					value={this.props.getSetting('translate_sent_messages')}
+					onChange={() => this.props.toggleSetting("translate_sent_messages")}
 				/>
 				<SwitchItem
 					children={["Translate Received Messages"]}
 					note="Whether or not to translate messages you receive automagically. This only works in the current channel."
-					value={this.state.settings.translate_received_messages}
-					onChange={(event) => {
-						this.setSetting(
-							"translate_received_messages",
-							event.target.checked
-						);
-					}}
+					value={this.props.getSetting('translate_received_messages')}
+					onChange={() => this.props.toggleSetting("translate_received_messages")}
 				/>
 				<SelectInput
 					children={["Translation Engine"]}
 					note="The translation engine you want to use."
 					searchable={true}
-					value={this.state.settings.translation_engine}
+					value={this.props.getSetting('translation_engine')}
 					options={engineOptions}
-					onChange={(event) => {
-						this.setSetting("translation_engine", event.value);
-					}}
+					onChange={e => this.props.updateSetting("translation_engine", e.value)}
 				/>
 				<SelectInput
 					children={["Your Language"]}
 					note="The language you speak. Incoming messages will be translated to this language."
 					searchable={true}
-					value={this.state.settings.user_language}
+					value={this.props.getSetting('user_language')}
 					options={engineLanguages}
-					onChange={(event) => {
-						this.setSetting("user_language", event.value);
-					}}
+					onChange={e => this.props.updateSetting("user_language", e.value)}
 				/>
 				<SelectInput
 					children={["Target Language"]}
 					note="The language you wish you could speak. Outgoing messages will be translated to this language."
 					searchable={true}
-					value={this.state.settings.target_language}
+					value={this.props.getSetting('target_language')}
 					options={engineLanguages}
-					onChange={(event) => {
-						this.setSetting("target_language", event.value);
-					}}
+					onChange={e => this.props.updateSetting("target_language", e.value)}
 				/>
 			</React.Fragment>
 		);
 	}
 }
 
-module.exports = WrapBoundary(Settings);
+module.exports = Settings;

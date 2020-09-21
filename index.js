@@ -1,35 +1,42 @@
-const { Plugin } = require("powercord/entities");
-const {
-	Webpack: {
-		FindModule,
-		CommonModules: { React, FluxDispatcher },
-	},
-	Tools: { ReactTools },
-} = KLibrary;
-const Settings = new KLibrary.Settings("message-translate");
+/*
+ * Copyright (c) 2020 Bowser65
+ * Licensed under the Open Software License version 3.0
+ * Original work under MIT; See LICENSE.
+ */
 
-const MiniPopover = FindModule.byFilter(
-	(m) => m.default.displayName === "MiniPopover"
-);
+const { Plugin } = require("powercord/entities");
+
 const TranslateButton = require("./components/TranslateButton");
 const Indicator = require("./components/Indicator");
-const ChannelTextAreaContainer = FindModule.byFilter(
-	(m) => m.type.render.displayName === "ChannelTextAreaContainer"
-);
-const MessageContent = FindModule.byFilter(
-	(m) => m.type.displayName === "MessageContent"
-);
 
+const { open: openModal } = require("powercord/modal");
 const { findInReactTree } = require("powercord/util");
 const { inject, uninject } = require("powercord/injector");
 
+const SettingsModal = require("./components/SettingsModal");
 const SettingsButton = require("./components/SettingsButton");
 const Translator = new (require("./TranslationHandler"))();
 
-const MessageEvents = FindModule.byProps("sendMessage", "editMessage");
-const { getChannelId } = FindModule.byProps("getChannelId");
+const { React, FluxDispatcher, getModule, messages: MessageEvents, channels: { getChannelId } } = require('powercord/webpack');
+
+const MiniPopover = getModule(
+	(m) => m.default && m.default.displayName === "MiniPopover", false
+);
+const ChannelTextAreaContainer = getModule(
+	(m) => m.type && m.type.render && m.type.render.displayName === "ChannelTextAreaContainer", false
+);
+const MessageContent = getModule(
+	(m) => m.type && m.type.displayName === "MessageContent", false
+);
+
 
 module.exports = class MessageTranslate extends Plugin {
+	constructor () {
+		super()
+		this.ConnectedSettingsButton = this.settings.connectStore(SettingsButton)
+		this.ConnectedSettingsModal = this.settings.connectStore(SettingsModal)
+		this.ConnectedTranslateButton = this.settings.connectStore(TranslateButton)
+	}
 	async startPlugin() {
 		this.loadStylesheet("style.scss");
 
@@ -55,11 +62,11 @@ module.exports = class MessageTranslate extends Plugin {
 						args[0].message.id,
 						false
 					);
-					const settings = Settings.getSettings();
+
 					Translator.translateMessage(
 						args[0].message,
 						currentLanguage,
-						settings.translation_engine
+						this.settings.get('translation_engine')
 					).catch((e) => {
 						console.error(e);
 						powercord.api.notices.sendToast(
@@ -77,13 +84,12 @@ module.exports = class MessageTranslate extends Plugin {
 					args[0].message &&
 					args[0].message.state !== "SENDING" &&
 					args[0].message.channel_id == getChannelId() &&
-					Settings.getSetting("translate_received_messages")
+					this.settings.get("translate_received_messages")
 				) {
-					const settings = Settings.getSettings();
 					Translator.translateMessage(
 						args[0].message,
-						settings.target_language,
-						settings.translation_engine
+						this.settings.get('target_language'),
+						this.settings.get('translation_engine')
 					).catch((e) => {
 						console.error(e);
 						powercord.api.notices.sendToast(
@@ -106,16 +112,14 @@ module.exports = class MessageTranslate extends Plugin {
 			MessageEvents,
 			"sendMessage",
 			(args) => {
-				const settings = Settings.getSettings();
-
-				if (settings.translate_sent_messages && !args[1].translation) {
+				if (this.settings.get('translate_sent_messages') && !args[1].translation) {
 					// Make a copy of the original text.
 					const originalContent = (args[1].content + " ").trim();
 
 					Translator.translate(
 						args[1].content,
-						settings.target_language,
-						settings.translation_engine
+						this.settings.get('target_language'),
+						this.settings.get('translation_engine')
 					)
 						.then((message) => {
 							args[1].content = message.text;
@@ -173,7 +177,8 @@ module.exports = class MessageTranslate extends Plugin {
 				if (!props) return res;
 
 				res.props.children.unshift(
-					React.createElement(TranslateButton, {
+					React.createElement(this.ConnectedTranslateButton, {
+						openSettings: () => this.openSettings(),
 						message: props.message,
 						Translator,
 					})
@@ -196,7 +201,10 @@ module.exports = class MessageTranslate extends Plugin {
 						r && r.className && r.className.indexOf("buttons-") == 0
 				);
 				props.children.unshift(
-					React.createElement(SettingsButton, { Translator })
+					React.createElement(this.ConnectedSettingsButton, {
+						Translator,
+						onClick: () => this.openSettings()
+					})
 				);
 
 				return res;
@@ -211,8 +219,6 @@ module.exports = class MessageTranslate extends Plugin {
 			MessageContent,
 			"type",
 			(args, res) => {
-				const settings = Settings.getSettings();
-
 				try {
 					res.props.children.push(
 						React.createElement(Indicator, {
@@ -225,7 +231,7 @@ module.exports = class MessageTranslate extends Plugin {
 								Translator.cache[args[0].message.channel_id][
 									args[0].message.id
 								].currentLanguage,
-							targetLanguage: settings.target_language,
+							targetLanguage: this.settings.get('target_language'),
 						})
 					);
 				} catch {}
@@ -235,8 +241,6 @@ module.exports = class MessageTranslate extends Plugin {
 		);
 
 		MessageContent.type.displayName = "MessageContent";
-
-		ReactTools.rerenderAllMessages();
 	}
 
 	pluginWillUnload() {
@@ -247,7 +251,6 @@ module.exports = class MessageTranslate extends Plugin {
 		uninject("message-translate-settings-button");
 		uninject("message-translate-message-content");
 		Translator.clearCache();
-		ReactTools.rerenderAllMessages();
 	}
 
 	generateToastID() {
@@ -258,5 +261,9 @@ module.exports = class MessageTranslate extends Plugin {
 				.replace(/[^a-z]+/g, "")
 				.substr(0, 5)
 		);
+	}
+
+	openSettings () {
+		openModal(() => React.createElement(this.ConnectedSettingsModal, { Translator }))
 	}
 };

@@ -1,15 +1,13 @@
-const {
-	Webpack: {
-		FindModule,
-		CommonModules: { React },
-	},
-	Tools: {
-		ReactTools: { WrapBoundary },
-	},
-} = KLibrary;
+/*
+ * Copyright (c) 2020 Bowser65
+ * Licensed under the Open Software License version 3.0
+ * Original work under MIT; See LICENSE.
+ */
 
-const Tooltip = FindModule.byDisplayName("Tooltip");
-const classes = FindModule.byProps("edited");
+const { React, getModule, getModuleByDisplayName } = require('powercord/webpack')
+
+const Tooltip = getModuleByDisplayName('Tooltip', false)
+const classes = getModule([ "edited" ], false);
 
 class Indicator extends React.Component {
 	constructor(props) {
@@ -52,4 +50,4 @@ class Indicator extends React.Component {
 	}
 }
 
-module.exports = WrapBoundary(Indicator);
+module.exports = Indicator;

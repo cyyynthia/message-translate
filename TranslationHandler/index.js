@@ -1,12 +1,6 @@
-const {
-	Webpack: {
-		FindModule,
-		CommonModules: { FluxDispatcher },
-	},
-} = KLibrary;
-const Settings = new KLibrary.Settings("message-translate");
+const { getModule, FluxDispatcher } = require('powercord/webpack')
 
-const { getMessage } = FindModule.byProps("getMessages");
+const { getMessage } = getModule([ "getMessages" ], false);
 const translatte = require("../node_modules/translatte");
 const randomUseragent = require("../node_modules/random-useragent");
 
@@ -1078,7 +1072,7 @@ class Translator {
 		}
 
 		// If the target language is the original language, set it back.
-		const settings = Settings.getSettings();
+
 		// If the target language is cached, use it.
 		if (language == "original") {
 			this.cache[message.channel_id][message.id].currentLanguage =
