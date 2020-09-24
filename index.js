@@ -15,9 +15,10 @@ const { inject, uninject } = require("powercord/injector");
 
 const SettingsModal = require("./components/SettingsModal");
 const SettingsButton = require("./components/SettingsButton");
+const QuickSettings = require("./components/QuickSettings");
 const Translator = new (require("./TranslationHandler"))();
 
-const { React, FluxDispatcher, getModule, messages: MessageEvents, channels: { getChannelId } } = require('powercord/webpack');
+const { React, FluxDispatcher, getModule, messages: MessageEvents, channels: { getChannelId }, contextMenu: { openContextMenu } } = require('powercord/webpack');
 
 const MiniPopover = getModule(
 	(m) => m.default && m.default.displayName === "MiniPopover", false
@@ -29,18 +30,19 @@ const MessageContent = getModule(
 	(m) => m.type && m.type.displayName === "MessageContent", false
 );
 
-
 module.exports = class MessageTranslate extends Plugin {
 	constructor () {
 		super()
 		this.ConnectedSettingsButton = this.settings.connectStore(SettingsButton)
 		this.ConnectedSettingsModal = this.settings.connectStore(SettingsModal)
 		this.ConnectedTranslateButton = this.settings.connectStore(TranslateButton)
-	}
+		this.ConnectedQuickSettings = this.settings.connectStore(QuickSettings)
+  }
+
 	async startPlugin() {
 		this.loadStylesheet("style.scss");
 
-		inject(
+		inject( // todo: use proper subscribe instead
 			"message-translate-dispatcher",
 			FluxDispatcher,
 			"dispatch",
@@ -49,14 +51,9 @@ module.exports = class MessageTranslate extends Plugin {
 					args[0].type == "MESSAGE_UPDATE" &&
 					!args[0].translation &&
 					Translator.cache[args[0].message.channel_id] &&
-					Translator.cache[args[0].message.channel_id][
-						args[0].message.id
-					]
+					Translator.cache[args[0].message.channel_id][args[0].message.id]
 				) {
-					const currentLanguage =
-						Translator.cache[args[0].message.channel_id][
-							args[0].message.id
-						].currentLanguage;
+					const currentLanguage = Translator.cache[args[0].message.channel_id][args[0].message.id].currentLanguage;
 					Translator.removeMessage(
 						args[0].message.channel_id,
 						args[0].message.id,
@@ -202,9 +199,13 @@ module.exports = class MessageTranslate extends Plugin {
 				);
 				props.children.unshift(
 					React.createElement(this.ConnectedSettingsButton, {
-						Translator,
-						onClick: () => this.openSettings()
-					})
+            onClick: () => this.openSettings(),
+            onContextMenu: (e) => openContextMenu(e, () =>
+              React.createElement(this.ConnectedQuickSettings, {
+                openSettings: () => this.openSettings()
+              })
+            )
+          })
 				);
 
 				return res;
@@ -222,15 +223,8 @@ module.exports = class MessageTranslate extends Plugin {
 				try {
 					res.props.children.push(
 						React.createElement(Indicator, {
-							Translator,
-							originalLanguage:
-								Translator.cache[args[0].message.channel_id][
-									args[0].message.id
-								].originalLanguage,
-							currentLanguage:
-								Translator.cache[args[0].message.channel_id][
-									args[0].message.id
-								].currentLanguage,
+							originalLanguage: Translator.cache[args[0].message.channel_id][args[0].message.id].originalLanguage,
+							currentLanguage: Translator.cache[args[0].message.channel_id][args[0].message.id].currentLanguage,
 							targetLanguage: this.settings.get('target_language'),
 						})
 					);
@@ -264,6 +258,6 @@ module.exports = class MessageTranslate extends Plugin {
 	}
 
 	openSettings () {
-		openModal(() => React.createElement(this.ConnectedSettingsModal, { Translator }))
+		openModal(() => React.createElement(this.ConnectedSettingsModal))
 	}
 };

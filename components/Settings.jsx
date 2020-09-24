@@ -5,49 +5,27 @@
  */
 
 const { React } = require('powercord/webpack')
+const { settings: { SelectInput, SwitchItem } } = require("powercord/components");
 
-const {
-	settings: { SelectInput, SwitchItem },
-} = require("powercord/components");
+const { Engines } = require('../constants')
+const { languagesForEngine } = require('../utils')
 
 class Settings extends React.Component {
 	render() {
-		const engineOptions = Object.keys(this.props.Translator.engines).map(
+		const engineOptions = Object.keys(Engines).map(
 			(engine) => {
 				return {
-					label: this.props.Translator.engines[engine].name,
-					value: this.props.Translator.engines[
-						engine
-					].name.toLowerCase(),
+					label: Engines[engine].name,
+					value: Engines[engine].name.toLowerCase(),
 				};
 			}
 		);
 		let engineLanguages = [];
 
 		if (this.props.getSetting('translation_engine')) {
-			engineLanguages = this.props.Translator.engines[
-				this.props.getSetting('translation_engine')
-			].languages.map((language) => {
-				if (this.props.Translator.isoLangs[language]) {
-					let label = this.props.Translator.isoLangs[language]
-						.nativeName;
-					if (
-						this.props.Translator.isoLangs[language].nativeName !=
-						this.props.Translator.isoLangs[language].name
-					) {
-						label = `${this.props.Translator.isoLangs[language].name} | ${this.props.Translator.isoLangs[language].nativeName}`;
-					}
-					return {
-						label,
-						value: language,
-					};
-				}
-				return {
-					label: language,
-					value: language,
-				};
-			});
+			engineLanguages = languagesForEngine(this.props.getSetting('translation_engine'));
 		}
+
 		return (
 			<React.Fragment>
 				<SwitchItem

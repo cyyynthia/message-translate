@@ -6,6 +6,8 @@
 
 const { React, getModule, getModuleByDisplayName } = require('powercord/webpack')
 
+const { IsoLangs } = require('../constants')
+
 const Tooltip = getModuleByDisplayName('Tooltip', false)
 const classes = getModule([ "edited" ], false);
 
@@ -22,13 +24,9 @@ class Indicator extends React.Component {
 		let tooltip = "Unknown";
 
 		try {
-			tooltip = this.props.Translator.isoLangs[tooltipLanguage]
-				.nativeName;
-			if (
-				this.props.Translator.isoLangs[tooltipLanguage].nativeName !=
-				this.props.Translator.isoLangs[tooltipLanguage].name
-			) {
-				tooltip = `${this.props.Translator.isoLangs[tooltipLanguage].name} | ${this.props.Translator.isoLangs[tooltipLanguage].nativeName}`;
+			tooltip = IsoLangs[tooltipLanguage].nativeName;
+			if (IsoLangs[tooltipLanguage].nativeName !== IsoLangs[tooltipLanguage].name) {
+				tooltip = `${IsoLangs[tooltipLanguage].name} | ${IsoLangs[tooltipLanguage].nativeName}`;
 			}
 		} catch {}
 

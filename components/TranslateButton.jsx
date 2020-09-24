@@ -42,16 +42,9 @@ class TranslateButton extends React.Component {
 							} else {
 								let targetLanguage = this.props.getSetting('user_language');
 								if (
-									this.props.Translator.cache[
-										this.props.message.channel_id
-									] &&
-									this.props.Translator.cache[
-										this.props.message.channel_id
-									][this.props.message.id] &&
-									this.props.Translator.cache[
-										this.props.message.channel_id
-									][this.props.message.id].currentLanguage !=
-										"original"
+									this.props.Translator.cache[this.props.message.channel_id] &&
+									this.props.Translator.cache[this.props.message.channel_id][this.props.message.id] &&
+									this.props.Translator.cache[this.props.message.channel_id][this.props.message.id].currentLanguage != "original"
 								) {
 									targetLanguage = "original";
 								}
