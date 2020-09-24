@@ -28,6 +28,7 @@ class SettingsButton extends React.Component {
 						look={Button.Looks.BLANK}
 						size={Button.Sizes.ICON}
 						onClick={() => this.props.onClick()}
+						onContextMenu={() => this.props.onContextMenu()}
 						onMouseEnter={onMouseEnter}
 						onMouseLeave={onMouseLeave}
 					>

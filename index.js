@@ -203,7 +203,8 @@ module.exports = class MessageTranslate extends Plugin {
 				props.children.unshift(
 					React.createElement(this.ConnectedSettingsButton, {
 						Translator,
-						onClick: () => this.openSettings()
+						onClick: () => this.openSettings(),
+						onContextMenu: () => this.settings.set("translate_sent_messages")
 					})
 				);
 
