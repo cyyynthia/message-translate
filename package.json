@@ -4,7 +4,7 @@
 	"main": "index.js",
 	"license": "(MIT OR OSL-3.0)",
 	"dependencies": {
-		"random-useragent": "^0.5.0",
-		"translatte": "^2.5.8"
+		"@k3rn31p4nic/google-translate-api": "github:k3rn31p4nic/google-translate-api",
+		"random-useragent": "^0.5.0"
 	}
 }
