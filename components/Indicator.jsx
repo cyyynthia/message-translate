@@ -17,17 +17,16 @@ class Indicator extends React.Component {
 	}
 
 	render() {
-		const tooltipLanguage =
-			this.props.currentLanguage === "original"
-				? this.props.originalLanguage
-				: this.props.currentLanguage;
+		const langFrom = this.props.targetLanguage;
+		const langTo = this.props.currentLanguage;
 		let tooltip = "Unknown";
 
 		try {
-			tooltip = IsoLangs[tooltipLanguage].nativeName;
-			if (IsoLangs[tooltipLanguage].nativeName !== IsoLangs[tooltipLanguage].name) {
-				tooltip = `${IsoLangs[tooltipLanguage].name} | ${IsoLangs[tooltipLanguage].nativeName}`;
-			}
+			// tooltip = `
+			// 	From: ${IsoLangs[langFrom].name} | ${IsoLangs[langFrom].nativeName} 
+			// 	To: ${IsoLangs[langTo].name} | ${IsoLangs[langTo].nativeName}
+			// `;
+			tooltip = `From: ${IsoLangs[langFrom].name} | To: ${IsoLangs[langTo].name}`;
 		} catch {}
 
 		return (
@@ -38,9 +37,7 @@ class Indicator extends React.Component {
 						onMouseEnter={onMouseEnter}
 						onMouseLeave={onMouseLeave}
 					>
-						{this.props.currentLanguage === "original"
-							? "(original)"
-							: "(translated)"}
+						{(this.props.currentLanguage === "original") ? "": "(translated)"}
 					</span>
 				)}
 			</Tooltip>
