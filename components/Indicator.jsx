@@ -4,7 +4,7 @@
  * Original work under MIT; See LICENSE.
  */
 
-const { React, getModule, getModuleByDisplayName } = require('powercord/webpack')
+const { React, getModule, getModuleByDisplayName, i18n: { Messages } } = require('powercord/webpack')
 
 const { IsoLangs } = require('../constants')
 
@@ -37,7 +37,7 @@ class Indicator extends React.Component {
 						onMouseEnter={onMouseEnter}
 						onMouseLeave={onMouseLeave}
 					>
-						{(this.props.currentLanguage === "original") ? "": "(translated)"}
+						{(this.props.currentLanguage === "original") ? "": `(${Messages.TRANSLATED})`}
 					</span>
 				)}
 			</Tooltip>

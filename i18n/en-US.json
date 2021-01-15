@@ -1,0 +1,20 @@
+{
+    "TRANSLATE":"Translate",
+    "TRANSLATE_MESSAGE": "Translate message",
+    "SHOW_ORIGINAL_MESSAGE": "Show original message",
+    "FAILED_TRANSLATE": "Failed to translate your message.",
+    "TRANSLATED": "translated",
+    "TRANSLATE_SENT_MESSAGES": "Translate Sent Messages",
+    "TRANSLATE_SENT_MESSAGES_NOTE": "Whether or not to translate messages you send.",
+    "TRANSLATE_RECEIVED_MESSAGES": "Translate Received Messages",
+    "TRANSLATE_RECEIVED_MESSAGES_NOTE": "Whether or not to translate messages you receive automagically. This only works in the current channel.",
+    "TRANSLATION_ENGINE": "Translation Engine",
+    "TRANSLATION_ENGINE_NOTE": "The translation engine you want to use.",
+    "YOUR_LANGUAGE": "Your Language",
+    "YOUR_LANGUAGE_NOTE": "The language you speak. Incoming messages will be translated to this language.",
+    "TARGET_LANGUAGE": "Target Language",
+    "TARGET_LANGUAGE_NOTE": "The language you wish you could speak. Outgoing messages will be translated to this language.",
+    "OPEN_SETTINGS": "Open Settings",
+    "MESSAGE_TRANSLATE_SETTINGS": "Message Translate Settings",
+    "CLOSE_SETTINGS":"Close Settings"
+}

@@ -4,7 +4,7 @@
  * Original work under MIT; See LICENSE.
  */
 
-const { React } = require("powercord/webpack");
+const { React, i18n: { Messages } } = require("powercord/webpack");
 const { Button } = require("powercord/components");
 const { Modal } = require("powercord/components/modal");
 const { FormTitle } = require("powercord/components");
@@ -16,7 +16,7 @@ class SettingsModal extends React.Component {
 		return (
 			<Modal className="powercord-text" size={Modal.Sizes.LARGE}>
 				<Modal.Header>
-					<FormTitle tag="h4">Message Translate Settings</FormTitle>
+					<FormTitle tag="h4">{Messages.MESSAGE_TRANSLATE_SETTINGS}</FormTitle>
 					<Modal.CloseButton onClick={closeModal} />
 				</Modal.Header>
 				<Modal.Content>
@@ -24,7 +24,7 @@ class SettingsModal extends React.Component {
 				</Modal.Content>
 				<Modal.Footer>
 					<Button onClick={closeModal}>
-						Close Settings
+						{Messages.CLOSE_SETTINGS}
 					</Button>
 				</Modal.Footer>
 			</Modal>

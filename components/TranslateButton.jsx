@@ -4,7 +4,7 @@
  * Original work under MIT; See LICENSE.
  */
 
-const { React, getModule, getModuleByDisplayName } = require('powercord/webpack');
+const { React, getModule, getModuleByDisplayName, i18n: { Messages } } = require('powercord/webpack');
 const translateAction = require('../TranslationHandler/translateAction');
 
 const Tooltip = getModuleByDisplayName('Tooltip', false);
@@ -20,7 +20,7 @@ class TranslateButton extends React.Component {
 
 	render() {
 		return (
-			<Tooltip color="black" postion="top" text="Translate Message">
+			<Tooltip color="black" postion="top" text={Messages.TRANSLATE_MESSAGE}>
 				{({ onMouseLeave, onMouseEnter }) => (
 					<Button
 						className={`message-translate-translate-button`}

@@ -3,7 +3,7 @@
  * Licensed under the Open Software License version 3.0
  */
 
-const { React, contextMenu: { closeContextMenu } } = require('powercord/webpack')
+const { React, contextMenu: { closeContextMenu }, i18n: { Messages } } = require('powercord/webpack')
 const { Menu } = require('powercord/components')
 
 module.exports = React.memo(
@@ -12,13 +12,13 @@ module.exports = React.memo(
       <Menu.MenuGroup id='toggles'>
         <Menu.MenuCheckboxItem
           id='sent'
-          label='Translate Sent Messages'
+          label={Messages.TRANSLATE_SENT_MESSAGES}
           checked={getSetting('translate_sent_messages')}
           action={() => toggleSetting('translate_sent_messages')}
         />
         <Menu.MenuCheckboxItem
           id='received'
-          label='Translate Received Messages'
+          label={Messages.TRANSLATE_RECEIVED_MESSAGES}
           checked={getSetting('translate_received_messages')}
           action={() => toggleSetting('translate_received_messages')}
         />
@@ -26,7 +26,7 @@ module.exports = React.memo(
       <Menu.MenuGroup id='settings'>
         <Menu.MenuItem
           id='open-settings'
-          label='Open Settings'
+          label={Messages.OPEN_SETTINGS}
           action={() => openSettings()}
         />
       </Menu.MenuGroup>

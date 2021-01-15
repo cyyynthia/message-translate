@@ -8,6 +8,7 @@ const { Plugin } = require("powercord/entities");
 
 const TranslateButton = require("./components/TranslateButton");
 const Indicator = require("./components/Indicator");
+const i18n = require('./i18n');
 
 const { open: openModal } = require("powercord/modal");
 const { findInReactTree } = require("powercord/util");
@@ -19,7 +20,7 @@ const QuickSettings = require("./components/QuickSettings");
 const Translator = new (require("./TranslationHandler"))();
 const translateAction = require('./TranslationHandler/translateAction');
 
-const { React, FluxDispatcher, getModule, messages: MessageEvents, channels: { getChannelId }, contextMenu: { openContextMenu } } = require('powercord/webpack');
+const { React, FluxDispatcher, getModule, messages: MessageEvents, channels: { getChannelId }, contextMenu: { openContextMenu }, i18n: { Messages }} = require('powercord/webpack');
 
 const MiniPopover = getModule(
 	(m) => m.default && m.default.displayName === "MiniPopover", false
@@ -46,6 +47,7 @@ module.exports = class MessageTranslate extends Plugin {
 
 	async startPlugin() {
 		this.loadStylesheet("style.scss");
+		powercord.api.i18n.loadAllStrings(i18n);
 
 		inject( // todo: use proper subscribe instead
 			"message-translate-dispatcher",
@@ -112,9 +114,8 @@ module.exports = class MessageTranslate extends Plugin {
 							powercord.api.notices.sendToast(
 								this.generateToastID(),
 								{
-									header: "Translate",
-									content:
-										"Failed to translate your message.",
+									header: Messages.TRANSLATE,
+									content: Messages.FAILED_TRANSLATE,
 									buttons: [
 										{
 											text: "Send Original Text",
@@ -252,7 +253,7 @@ module.exports = class MessageTranslate extends Plugin {
 							},
 							disabled: !message.content,
 							id: "translate-message",
-							label:  (isTranslated) ?  "Show original message" : "Translate message"
+							label:  (isTranslated) ?  Messages.SHOW_ORIGINAL_MESSAGE : Messages.TRANSLATE_MESSAGE
 						})
 					)
 				);
@@ -289,9 +290,8 @@ module.exports = class MessageTranslate extends Plugin {
 		powercord.api.notices.sendToast(
 			this.generateToastID(),
 			{
-				header: "Translate",
-				content:
-					"Failed to translate the message.",
+				header: Messages.TRANSLATE,
+				content: Messages.FAILED_TRANSLATE,
 				icon: "exclamation-triangle",
 				timeout: 3e3,
 			}
