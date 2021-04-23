@@ -8,6 +8,7 @@ const { Plugin } = require("powercord/entities");
 
 const TranslateButton = require("./components/TranslateButton");
 const Indicator = require("./components/Indicator");
+const i18n = require('./i18n');
 
 const { open: openModal } = require("powercord/modal");
 const { findInReactTree } = require("powercord/util");
@@ -17,8 +18,9 @@ const SettingsModal = require("./components/SettingsModal");
 const SettingsButton = require("./components/SettingsButton");
 const QuickSettings = require("./components/QuickSettings");
 const Translator = new (require("./TranslationHandler"))();
+const translateAction = require('./TranslationHandler/translateAction');
 
-const { React, FluxDispatcher, getModule, messages: MessageEvents, channels: { getChannelId }, contextMenu: { openContextMenu } } = require('powercord/webpack');
+const { React, FluxDispatcher, getModule, messages: MessageEvents, channels: { getChannelId }, contextMenu: { openContextMenu }, i18n: { Messages }} = require('powercord/webpack');
 
 const MiniPopover = getModule(
 	(m) => m.default && m.default.displayName === "MiniPopover", false
@@ -29,6 +31,10 @@ const ChannelTextAreaContainer = getModule(
 const MessageContent = getModule(
 	(m) => m.type && m.type.displayName === "MessageContent", false
 );
+const MessageContextMenu = getModule(
+	(m) => m?.default?.displayName === "MessageContextMenu", false
+);
+const { MenuGroup, MenuItem } = getModule(["MenuGroup", "MenuGroup"], false);
 
 module.exports = class MessageTranslate extends Plugin {
 	constructor () {
@@ -41,6 +47,7 @@ module.exports = class MessageTranslate extends Plugin {
 
 	async startPlugin() {
 		this.loadStylesheet("style.scss");
+		powercord.api.i18n.loadAllStrings(i18n);
 
 		inject( // todo: use proper subscribe instead
 			"message-translate-dispatcher",
@@ -64,18 +71,7 @@ module.exports = class MessageTranslate extends Plugin {
 						args[0].message,
 						currentLanguage,
 						this.settings.get('translation_engine')
-					).catch((e) => {
-						console.error(e);
-						powercord.api.notices.sendToast(
-							this.generateToastID(),
-							{
-								header: "Translate",
-								content: "Failed to translate the message.",
-								icon: "exclamation-triangle",
-								timeout: 3e3,
-							}
-						);
-					});
+					).catch(this.failedTranslate);
 				} else if (
 					args[0].type == "MESSAGE_CREATE" &&
 					args[0].message &&
@@ -87,18 +83,7 @@ module.exports = class MessageTranslate extends Plugin {
 						args[0].message,
 						this.settings.get('target_language'),
 						this.settings.get('translation_engine')
-					).catch((e) => {
-						console.error(e);
-						powercord.api.notices.sendToast(
-							this.generateToastID(),
-							{
-								header: "Translate",
-								content: "Failed to translate the message.",
-								icon: "exclamation-triangle",
-								timeout: 3e3,
-							}
-						);
-					});
+					).catch(this.failedTranslate);
 				}
 				return args;
 			}
@@ -129,9 +114,8 @@ module.exports = class MessageTranslate extends Plugin {
 							powercord.api.notices.sendToast(
 								this.generateToastID(),
 								{
-									header: "Translate",
-									content:
-										"Failed to translate your message.",
+									header: Messages.TRANSLATE,
+									content: Messages.FAILED_TRANSLATE,
 									buttons: [
 										{
 											text: "Send Original Text",
@@ -176,6 +160,7 @@ module.exports = class MessageTranslate extends Plugin {
 				res.props.children.unshift(
 					React.createElement(this.ConnectedTranslateButton, {
 						openSettings: () => this.openSettings(),
+						failedTranslate: () => this.failedTranslate(),
 						message: props.message,
 						Translator,
 					})
@@ -235,6 +220,48 @@ module.exports = class MessageTranslate extends Plugin {
 		);
 
 		MessageContent.type.displayName = "MessageContent";
+
+		inject(
+			"message-translate-contextmenu",
+			MessageContextMenu,
+			"default",
+			(args, res) => {
+				if (!args[0]?.message || !res?.props?.children) return res;
+				const message = args[0].message;
+				let isTranslated = false;
+
+				try{
+					isTranslated = Translator.cache[message.channel_id][message.id].currentLanguage != "original"
+				} catch {}
+
+				res.props.children.splice(
+					4,
+					0,
+					React.createElement(
+						MenuGroup,
+						null,
+						React.createElement(MenuItem, {
+							action: () => {
+								translateAction(
+									message,
+									this.settings.get('user_language'),
+									this.settings.get('translation_engine'),
+									Translator,
+									this.openSettings,
+									this.failedTranslate
+								)
+							},
+							disabled: !message.content,
+							id: "translate-message",
+							label:  (isTranslated) ?  Messages.SHOW_ORIGINAL_MESSAGE : Messages.TRANSLATE_MESSAGE
+						})
+					)
+				);
+				return res;
+			}
+		);
+
+		MessageContextMenu.default.displayName = "MessageContextMenu";
 	}
 
 	pluginWillUnload() {
@@ -244,6 +271,7 @@ module.exports = class MessageTranslate extends Plugin {
 		uninject("message-translate-translate-button");
 		uninject("message-translate-settings-button");
 		uninject("message-translate-message-content");
+		uninject("message-translate-contextmenu");
 		Translator.clearCache();
 	}
 
@@ -254,6 +282,19 @@ module.exports = class MessageTranslate extends Plugin {
 				.toString(36)
 				.replace(/[^a-z]+/g, "")
 				.substr(0, 5)
+		);
+	}
+
+	failedTranslate(e){
+		console.error(e);
+		powercord.api.notices.sendToast(
+			this.generateToastID(),
+			{
+				header: Messages.TRANSLATE,
+				content: Messages.FAILED_TRANSLATE,
+				icon: "exclamation-triangle",
+				timeout: 3e3,
+			}
 		);
 	}
 

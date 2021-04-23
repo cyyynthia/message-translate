@@ -7,7 +7,7 @@
 const { getModule, FluxDispatcher } = require('powercord/webpack')
 
 const { Engines } = require('../constants')
-const translatte = require("../node_modules/translatte");
+const translate = require("../node_modules/@k3rn31p4nic/google-translate-api");
 const randomUseragent = require("../node_modules/random-useragent");
 
 const { getMessage } = getModule([ "getMessages" ], false);
@@ -108,7 +108,7 @@ class Translator {
 		const translateFunctions = {
 			google: (text, language) => {
 				return new Promise((resolve, reject) => {
-					translatte(text, {
+					translate(text, {
 						to: language,
 						agents: randomUseragent.getAll(),
 					})

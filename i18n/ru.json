@@ -1,0 +1,20 @@
+{
+    "TRANSLATE":"Переводчик",
+    "TRANSLATE_MESSAGE": "Перевести сообщение",
+    "SHOW_ORIGINAL_MESSAGE": "Показать исходное сообщение",
+    "FAILED_TRANSLATE": "Не удалось перевести сообщение.",
+    "TRANSLATED": "переведено",
+    "TRANSLATE_SENT_MESSAGES": "Переводить отправленные сообщения",
+    "TRANSLATE_SENT_MESSAGES_NOTE": "Нужно ли переводить сообщения, которые вы отправляете.",
+    "TRANSLATE_RECEIVED_MESSAGES": "Переводить получаемые сообщения",
+    "TRANSLATE_RECEIVED_MESSAGES_NOTE": "Следует ли автоматически переводить сообщения, которые вы получаете. Это работает только в текущем канале.",
+    "TRANSLATION_ENGINE": "Служба перевода",
+    "TRANSLATION_ENGINE_NOTE": "Служба перевода, которую вы хотите использовать.",
+    "YOUR_LANGUAGE": "Ваш язык",
+    "YOUR_LANGUAGE_NOTE": "Ваш язык. Входящие сообщения будут переведены на этот язык.",
+    "TARGET_LANGUAGE": "Переводимый язык",
+    "TARGET_LANGUAGE_NOTE": "Язык, на котором вы хотите говорить. Исходящие сообщения будут переведены на этот язык.",
+    "OPEN_SETTINGS": "Открыть настройки",
+    "MESSAGE_TRANSLATE_SETTINGS": "Настройки переводчика",
+    "CLOSE_SETTINGS":"Закрыть настройки"
+}

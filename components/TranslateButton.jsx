@@ -4,9 +4,10 @@
  * Original work under MIT; See LICENSE.
  */
 
-const { React, getModule, getModuleByDisplayName } = require('powercord/webpack')
+const { React, getModule, getModuleByDisplayName, i18n: { Messages } } = require('powercord/webpack');
+const translateAction = require('../TranslationHandler/translateAction');
 
-const Tooltip = getModuleByDisplayName('Tooltip', false)
+const Tooltip = getModuleByDisplayName('Tooltip', false);
 const classes = getModule([ "icon", "isHeader" ], false);
 const { Button } = getModule(
 	(m) => m.default && m.default.displayName === "MiniPopover", false
@@ -17,57 +18,20 @@ class TranslateButton extends React.Component {
 		super(props);
 	}
 
-	generateToastID() {
-		return (
-			"translate-translating-" +
-			Math.random()
-				.toString(36)
-				.replace(/[^a-z]+/g, "")
-				.substr(0, 5)
-		);
-	}
-
 	render() {
 		return (
-			<Tooltip color="black" postion="top" text="Translate Message">
+			<Tooltip color="black" postion="top" text={Messages.TRANSLATE_MESSAGE}>
 				{({ onMouseLeave, onMouseEnter }) => (
 					<Button
 						className={`message-translate-translate-button`}
-						onClick={async () => {
-							if (
-								!this.props.getSetting('translation_engine') ||
-								!this.props.getSetting('user_language')
-							) {
-								this.props.openSettings()
-							} else {
-								let targetLanguage = this.props.getSetting('user_language');
-								if (
-									this.props.Translator.cache[this.props.message.channel_id] &&
-									this.props.Translator.cache[this.props.message.channel_id][this.props.message.id] &&
-									this.props.Translator.cache[this.props.message.channel_id][this.props.message.id].currentLanguage != "original"
-								) {
-									targetLanguage = "original";
-								}
-
-								this.props.Translator.translateMessage(
-									this.props.message,
-									targetLanguage,
-									this.props.getSetting('translation_engine')
-								).catch((e) => {
-									console.error(e);
-									powercord.api.notices.sendToast(
-										this.generateToastID(),
-										{
-											header: "Translate",
-											content:
-												"Failed to translate the message.",
-											icon: "exclamation-triangle",
-											timeout: 3e3,
-										}
-									);
-								});
-							}
-						}}
+						onClick={() => translateAction(
+							this.props.message,
+							this.props.getSetting('user_language'),
+							this.props.getSetting('translation_engine'),
+							this.props.Translator,
+							this.props.openSettings,
+							this.props.failedTranslate
+						)}
 						onMouseEnter={onMouseEnter}
 						onMouseLeave={onMouseLeave}
 					>
