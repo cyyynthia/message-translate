@@ -3,7 +3,7 @@
  * Licensed under the Open Software License version 3.0
  */
 
-const { Engines, IsoLangs } = require('./constants')
+const { Engines, IsoLangs } = require("./constants")
 
 module.exports = {
   languagesForEngine (engine) {
