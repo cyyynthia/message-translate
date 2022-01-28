@@ -25,8 +25,8 @@ const { React, FluxDispatcher, getModule, messages: MessageEvents, channels: { g
 const MiniPopover = getModule(
 	(m) => m.default && m.default.displayName === "MiniPopover", false
 );
-const ChannelTextAreaContainer = getModule(
-	(m) => m.type && m.type.render && m.type.render.displayName === "ChannelTextAreaContainer", false
+const ChannelTextAreaButtons = getModule(
+	(m) => m.type && m.type.displayName === "ChannelTextAreaButtons", false
 );
 const MessageContent = getModule(
 	(m) => m.type && m.type.displayName === "MessageContent", false
@@ -173,16 +173,11 @@ module.exports = class MessageTranslate extends Plugin {
 
 		inject(
 			"message-translate-settings-button",
-			ChannelTextAreaContainer.type,
-			"render",
+			ChannelTextAreaButtons,
+			"type",
 			(args, res) => {
 				// Add to the buttons.
-				const props = findInReactTree(
-					res,
-					(r) =>
-						r && r.className && r.className.indexOf("buttons-") == 0
-				);
-				props.children.unshift(
+				res.props.children.unshift(
 					React.createElement(this.ConnectedSettingsButton, {
             onClick: () => this.openSettings(),
             onContextMenu: (e) => openContextMenu(e, () =>
@@ -197,8 +192,7 @@ module.exports = class MessageTranslate extends Plugin {
 			}
 		);
 
-		ChannelTextAreaContainer.type.render.displayName =
-			"ChannelTextAreaContainer";
+		ChannelTextAreaButtons.type.displayName = "ChannelTextAreaButtons";
 
 		inject(
 			"message-translate-message-content",
