@@ -3,8 +3,12 @@
  * Licensed under the Open Software License version 3.0
  */
 
-const { React, contextMenu: { closeContextMenu }, i18n: { Messages } } = require("powercord/webpack")
-const { Menu } = require("powercord/components")
+const {
+  React,
+  contextMenu: { closeContextMenu },
+  i18n: { Messages }
+} = require("powercord/webpack");
+const { Menu } = require("powercord/components");
 
 module.exports = React.memo(
   ({ openSettings, getSetting, toggleSetting }) => (
@@ -32,4 +36,4 @@ module.exports = React.memo(
       </Menu.MenuGroup>
     </Menu.Menu>
   )
-)
+);

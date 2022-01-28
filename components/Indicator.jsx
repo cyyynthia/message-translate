@@ -4,9 +4,14 @@
  * Original work under MIT; See LICENSE.
  */
 
-const { React, getModule, getModuleByDisplayName, i18n: { Messages } } = require("powercord/webpack")
+const {
+  React,
+  getModule,
+  getModuleByDisplayName,
+  i18n: { Messages }
+} = require("powercord/webpack");
 
-const { IsoLangs } = require("../constants")
+const { IsoLangs } = require("../constants");
 
 const Tooltip = getModuleByDisplayName("Tooltip", false)
 const classes = getModule([ "edited" ], false);

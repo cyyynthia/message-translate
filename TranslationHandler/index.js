@@ -145,7 +145,7 @@ class Translator {
           //   )}`
           // );
         });
-      },
+      }
     };
 
     let translatePromise = (resolve, reject) => {

@@ -17,4 +17,4 @@ module.exports = async function(message, userLang, langEngine, Translator, openS
       langEngine
     ).catch(failedTranslate);
   }
-}
+};

@@ -4,11 +4,11 @@
  * Original work under MIT; See LICENSE.
  */
 
-const { React, i18n: { Messages } } = require("powercord/webpack")
+const { React, i18n: { Messages } } = require("powercord/webpack");
 const { settings: { SelectInput, SwitchItem } } = require("powercord/components");
 
-const { Engines } = require("../constants")
-const { languagesForEngine } = require("../utils")
+const { Engines } = require("../constants");
+const { languagesForEngine } = require("../utils");
 
 class Settings extends React.Component {
   render() {

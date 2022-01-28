@@ -3,10 +3,10 @@
  * Licensed under the Open Software License version 3.0
  */
 
-const { Engines, IsoLangs } = require("./constants")
+const { Engines, IsoLangs } = require("./constants");
 
 module.exports = {
-  languagesForEngine (engine) {
+  languagesForEngine(engine) {
     if (!Engines[engine]) return null
 
     return Engines[engine].languages.map((language) => {
@@ -24,4 +24,4 @@ module.exports = {
       };
     });
   }
-}
+};

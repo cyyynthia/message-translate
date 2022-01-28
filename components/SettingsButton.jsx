@@ -4,9 +4,14 @@
  * Original work under MIT; See LICENSE.
  */
 
-const { React, getModule, getModuleByDisplayName, i18n: { Messages } } = require("powercord/webpack")
+const {
+  React,
+  getModule,
+  getModuleByDisplayName,
+  i18n: { Messages }
+} = require("powercord/webpack");
 const { Button } = require("powercord/components");
-const Tooltip = getModuleByDisplayName("Tooltip", false)
+const Tooltip = getModuleByDisplayName("Tooltip", false);
 
 const buttonClasses = getModule([ "button" ], false);
 const buttonWrapperClasses = getModule([ "buttonWrapper", "pulseButton" ], false);

@@ -21,13 +21,13 @@ const Translator = new (require("./TranslationHandler"))();
 const translateAction = require("./TranslationHandler/translateAction");
 
 const {
-	React,
-	FluxDispatcher,
-	getModule,
-	messages: MessageEvents,
-	channels: { getChannelId },
-	contextMenu: { openContextMenu },
-	i18n: { Messages }
+  React,
+  FluxDispatcher,
+  getModule,
+  messages: MessageEvents,
+  channels: { getChannelId },
+  contextMenu: { openContextMenu },
+  i18n: { Messages }
 } = require("powercord/webpack");
 
 const MiniPopover = getModule(
@@ -47,10 +47,10 @@ const { MenuGroup, MenuItem } = getModule(["MenuGroup", "MenuGroup"], false);
 module.exports = class MessageTranslate extends Plugin {
   constructor () {
     super()
-    this.ConnectedSettingsButton = this.settings.connectStore(SettingsButton)
-    this.ConnectedSettingsModal = this.settings.connectStore(SettingsModal)
-    this.ConnectedTranslateButton = this.settings.connectStore(TranslateButton)
-    this.ConnectedQuickSettings = this.settings.connectStore(QuickSettings)
+    this.ConnectedSettingsButton = this.settings.connectStore(SettingsButton);
+    this.ConnectedSettingsModal = this.settings.connectStore(SettingsModal);
+    this.ConnectedTranslateButton = this.settings.connectStore(TranslateButton);
+    this.ConnectedQuickSettings = this.settings.connectStore(QuickSettings);
   }
 
   async startPlugin() {
