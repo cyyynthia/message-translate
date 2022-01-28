@@ -93,17 +93,17 @@ class Translator {
 
     this.rateLimitCache[engine].lastRatelimit = timeout;
 
-    const createWindow = () => {
-      const window = new BrowserWindow({
-        show: false,
-        webPreferences: {
-          nodeIntegration: true,
-          nodeIntegrationInWorker: true,
-        },
-      });
-      window.webContents.openDevTools();
-      return window;
-    };
+    // const createWindow = () => {
+    //   const window = new BrowserWindow({
+    //     show: false,
+    //     webPreferences: {
+    //       nodeIntegration: true,
+    //       nodeIntegrationInWorker: true,
+    //     },
+    //   });
+    //   window.webContents.openDevTools();
+    //   return window;
+    // };
 
     const translateFunctions = {
       google: (text, language) => {
