@@ -14,7 +14,7 @@ const Settings = require("./Settings");
 class SettingsModal extends React.Component {
   render() {
     return (
-      <Modal className="powercord-text" size={Modal.Sizes.LARGE}>
+      <Modal className="powercord-text" size={Modal.Sizes.DYNAMIC}>
         <Modal.Header>
           <FormTitle tag="h4">{Messages.MESSAGE_TRANSLATE_SETTINGS}</FormTitle>
           <Modal.CloseButton onClick={closeModal} />
