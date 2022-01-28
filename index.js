@@ -41,6 +41,12 @@ const MessageContent = getModule(
 );
 const { MenuGroup, MenuItem } = getModule(["MenuGroup", "MenuGroup"], false);
 
+const generateToastID = () => "message-translate-translating-" +
+  Math.random()
+		.toString(36)
+		.replace(/[^a-z]+/g, "")
+		.substring(0, 5);
+
 module.exports = class MessageTranslate extends Plugin {
   constructor () {
     super()
@@ -290,7 +296,7 @@ module.exports = class MessageTranslate extends Plugin {
   failedTranslate(e) {
     console.error(e);
     powercord.api.notices.sendToast(
-      this.generateToastID(),
+      /*this.*/generateToastID(),
       {
         header: Messages.TRANSLATE,
         content: Messages.FAILED_TRANSLATE,

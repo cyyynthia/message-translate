@@ -7,7 +7,7 @@
 const { getModule, FluxDispatcher } = require("powercord/webpack");
 
 const { Engines } = require("../constants");
-const translate = require("../node_modules/@k3rn31p4nic/google-translate-api");
+const translate = require("../node_modules/@iamtraction/google-translate");
 const randomUseragent = require("../node_modules/random-useragent");
 
 const { getMessage } = getModule([ "getMessages" ], false);
