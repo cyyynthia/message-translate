@@ -39,9 +39,6 @@ const ChannelTextAreaButtons = getModule(
 const MessageContent = getModule(
   (m) => m.type && m.type.displayName === "MessageContent", false
 );
-const MessageContextMenu = getModule(
-  (m) => m?.default?.displayName === "MessageContextMenu", false
-);
 const { MenuGroup, MenuItem } = getModule(["MenuGroup", "MenuGroup"], false);
 
 module.exports = class MessageTranslate extends Plugin {
@@ -223,47 +220,49 @@ module.exports = class MessageTranslate extends Plugin {
 
     MessageContent.type.displayName = "MessageContent";
 
-    inject(
-      "message-translate-contextmenu",
-      MessageContextMenu,
-      "default",
-      (args, res) => {
-        if (!args[0]?.message || !res?.props?.children) return res;
-        const message = args[0].message;
-        let isTranslated = false;
+    this.lazyPatchContextMenu("MessageContextMenu", (MessageContextMenu) => {
+      inject(
+        "message-translate-contextmenu",
+        MessageContextMenu,
+        "default",
+        (args, res) => {
+          if (!args[0]?.message || !res?.props?.children) return res;
+          const message = args[0].message;
+          let isTranslated = false;
 
-        try {
-          isTranslated = Translator.cache[message.channel_id][message.id].currentLanguage != "original"
-        } catch {}
+          try {
+            isTranslated = Translator.cache[message.channel_id][message.id].currentLanguage != "original"
+          } catch {}
 
-        res.props.children.splice(
-          4,
-          0,
-          React.createElement(
-            MenuGroup,
-            null,
-            React.createElement(MenuItem, {
-              action: () => {
-                translateAction(
-                  message,
-                  this.settings.get("user_language"),
-                  this.settings.get("translation_engine"),
-                  Translator,
-                  this.openSettings,
-                  this.failedTranslate
-                )
-              },
-              disabled: !message.content,
-              id: "translate-message",
-              label:  (isTranslated) ?  Messages.SHOW_ORIGINAL_MESSAGE : Messages.TRANSLATE_MESSAGE
-            })
-          )
-        );
-        return res;
-      }
-    );
+          res.props.children.splice(
+            4,
+            0,
+            React.createElement(
+              MenuGroup,
+              null,
+              React.createElement(MenuItem, {
+                action: () => {
+                  translateAction(
+                    message,
+                    this.settings.get("user_language"),
+                    this.settings.get("translation_engine"),
+                    Translator,
+                    this.openSettings,
+                    this.failedTranslate
+                  )
+                },
+                disabled: !message.content,
+                id: "translate-message",
+                label:  (isTranslated) ?  Messages.SHOW_ORIGINAL_MESSAGE : Messages.TRANSLATE_MESSAGE
+              })
+            )
+          );
+          return res;
+        }
+      );
 
-    MessageContextMenu.default.displayName = "MessageContextMenu";
+      MessageContextMenu.default.displayName = "MessageContextMenu";
+    });
   }
 
   pluginWillUnload() {
@@ -274,6 +273,7 @@ module.exports = class MessageTranslate extends Plugin {
     uninject("message-translate-settings-button");
     uninject("message-translate-message-content");
     uninject("message-translate-contextmenu");
+    uninject("message-translate-lazy-contextmenu");
     Translator.clearCache();
   }
 
@@ -302,5 +302,37 @@ module.exports = class MessageTranslate extends Plugin {
 
   openSettings() {
     openModal(() => React.createElement(this.ConnectedSettingsModal))
+  }
+
+  // Credit to SammCheese:
+  // https://github.com/SammCheese/holy-notes/blob/e9157324c3d210f1f177c14c6f08ab0580b62dad/index.js#L70
+  async lazyPatchContextMenu(displayName, patch) {
+    const filter = (m) => m.default && m.default.displayName === displayName;
+    const m = getModule(filter, false);
+    if (m) patch(m);
+    else {
+      inject(
+        "message-translate-lazy-contextmenu",
+        getModule(["openContextMenuLazy"], false),
+        "openContextMenuLazy",
+        (args) => {
+          const lazyRender = args[1];
+          args[1] = async () => {
+            const render = await lazyRender(args[0]);
+            return (config) => {
+              const menu = render(config);
+              if (menu?.type?.displayName === displayName && patch) {
+                uninject("message-translate-lazy-contextmenu");
+                patch(getModule(filter, false));
+                patch = false;
+              }
+              return menu;
+            };
+          }
+          return args;
+        },
+        true
+      );
+    }
   }
 };
