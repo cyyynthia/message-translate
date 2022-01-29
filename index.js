@@ -296,7 +296,7 @@ module.exports = class MessageTranslate extends Plugin {
   failedTranslate(e) {
     console.error(e);
     powercord.api.notices.sendToast(
-      /*this.*/generateToastID(),
+      generateToastID(),
       {
         header: Messages.TRANSLATE,
         content: Messages.FAILED_TRANSLATE,
