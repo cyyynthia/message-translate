@@ -1,4 +1,4 @@
-const { get, post } = requiire("powercord/http");
+const { get, post } = require("powercord/http");
 const languages = require("./languages");
 const tokenGenerator = require("./tokenGenerator");
 
