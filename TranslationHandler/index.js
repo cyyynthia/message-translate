@@ -7,8 +7,7 @@
 const { getModule, FluxDispatcher } = require("powercord/webpack");
 
 const { Engines } = require("../constants");
-const translate = require("../node_modules/@iamtraction/google-translate");
-const randomUseragent = require("../node_modules/random-useragent");
+const googleTranslate = require("../node_modules/@iamtraction/google-translate");
 
 const { getMessage } = getModule([ "getMessages" ], false);
 
@@ -93,25 +92,10 @@ class Translator {
 
     this.rateLimitCache[engine].lastRatelimit = timeout;
 
-    // const createWindow = () => {
-    //   const window = new BrowserWindow({
-    //     show: false,
-    //     webPreferences: {
-    //       nodeIntegration: true,
-    //       nodeIntegrationInWorker: true,
-    //     },
-    //   });
-    //   window.webContents.openDevTools();
-    //   return window;
-    // };
-
     const translateFunctions = {
       google: (text, language) => {
         return new Promise((resolve, reject) => {
-          translate(text, {
-            to: language,
-            agents: randomUseragent.getAll(),
-          })
+          googleTranslate(text, { to: language })
             .then((res) => {
               resolve({
                 text: res.text,
@@ -121,29 +105,6 @@ class Translator {
             .catch((err) => {
               reject(err);
             });
-          // const window = createWindow();
-          // window.webContents.on("did-finish-load", () => {
-          //   ipc.on(
-          //     "message-translate-translation",
-          //     (event, message) => {
-          //       try {
-          //         window.close();
-          //       } catch {}
-          //       if (message) resolve(message);
-          //       reject();
-          //     }
-          //   );
-          //   window.webContents.executeJavaScript(`
-          //     require("electron").ipcRenderer.sendTo(${
-          //       remote.getCurrentWindow().webContents.id
-          //     }, "message-translate-translation", (document.querySelector(".translation") || {}).innerText);
-          //   `);
-          // });
-          // window.loadURL(
-          //   `https://translate.google.com/#auto/${language}/${encodeURIComponent(
-          //     text
-          //   )}`
-          // );
         });
       }
     };
