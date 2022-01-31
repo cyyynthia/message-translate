@@ -4,6 +4,6 @@
   "main": "index.js",
   "license": "(MIT OR OSL-3.0)",
   "dependencies": {
-    "@iamtraction/google-translate": "github:fifithebulldog/google-translate-api-powercord"
+    "@iamtraction/google-translate": "github:FifiTheBulldog/google-translate-api-powercord"
   }
 }

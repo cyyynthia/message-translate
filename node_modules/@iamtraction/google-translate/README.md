@@ -1,6 +1,14 @@
 # Google Translate API
 A [Node.JS](https://nodejs.org) library to consume Google Translate for free.
 
+> This version is modified by [FifiTheBulldog](https://github.com/FifiTheBulldog) for use in [Powercord](https://powercord.dev) plugins, particularly [Message Translate](https://github.com/cyyynthia/message-translate). It uses Powercord's HTTP library instead of `got`, and it strips out the token generator, which apparently doesn't work anyway and isn't needed to get results from Google Translate. The API described in the original README below ("Usage") has not changed, however.
+> 
+> To download this Powercord-ified version from GitHub, run the following command in a terminal:
+> 
+> ```bash
+> npm install FifiTheBulldog/google-translate-api-powercord
+> ```
+
 [![GitHub release](https://img.shields.io/github/release/iamtraction/google-translate.svg?style=flat)](https://github.com/iamtraction/google-translate/releases)
 [![Dependencies](https://david-dm.org/iamtraction/google-translate.svg)](https://david-dm.org/iamtraction/google-translate)
 [![Known Vulnerabilities](https://snyk.io/test/github/iamtraction/google-translate/badge.svg?targetFile=package.json)](https://snyk.io/test/github/iamtraction/google-translate?targetFile=package.json)
