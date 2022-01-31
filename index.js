@@ -307,7 +307,7 @@ module.exports = class MessageTranslate extends Plugin {
   }
 
   openSettings() {
-    openModal(() => React.createElement(this.ConnectedSettingsModal))
+    openModal(() => React.createElement(this.ConnectedSettingsModal));
   }
 
   // Credit to SammCheese:
