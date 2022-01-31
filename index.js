@@ -57,7 +57,11 @@ module.exports = class MessageTranslate extends Plugin {
   }
 
   async startPlugin() {
+<<<<<<< HEAD
     this.loadStylesheet("style.css");
+=======
+    this.loadStylesheet("style.scss");
+>>>>>>> upstream/master
     powercord.api.i18n.loadAllStrings(i18n);
 
     inject( // todo: use proper subscribe instead
@@ -296,7 +300,11 @@ module.exports = class MessageTranslate extends Plugin {
   failedTranslate(e) {
     console.error(e);
     powercord.api.notices.sendToast(
+<<<<<<< HEAD
       generateToastID(),
+=======
+      /*this.*/generateToastID(),
+>>>>>>> upstream/master
       {
         header: Messages.TRANSLATE,
         content: Messages.FAILED_TRANSLATE,
@@ -307,7 +315,11 @@ module.exports = class MessageTranslate extends Plugin {
   }
 
   openSettings() {
+<<<<<<< HEAD
     openModal(() => React.createElement(this.ConnectedSettingsModal));
+=======
+    openModal(() => React.createElement(this.ConnectedSettingsModal))
+>>>>>>> upstream/master
   }
 
   // Credit to SammCheese:
