@@ -57,7 +57,7 @@ module.exports = class MessageTranslate extends Plugin {
   }
 
   async startPlugin() {
-    this.loadStylesheet("style.scss");
+    this.loadStylesheet("style.css");
     powercord.api.i18n.loadAllStrings(i18n);
 
     inject( // todo: use proper subscribe instead
